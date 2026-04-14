@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>女神挖掘機</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080a0f; --surface: #0e1118; --card: #13161f; --border: #1e2333;
+    --gold: #c9a84c; --gold-light: #f0cc7a; --gold-dim: rgba(201,168,76,0.15);
+    --text: #e8e2d6; --muted: #6b7280; --white: #ffffff;
+  }
+  html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'Noto Serif TC', serif; }
+  body { display: flex; flex-direction: column; align-items: center; padding: 48px 20px 80px; position: relative; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  .container { position: relative; z-index: 1; width: 100%; max-width: 480px; display: flex; flex-direction: column; align-items: center; }
+  .avatar-wrap { position: relative; margin-bottom: 20px; animation: fadeDown 0.7s ease both; }
+  .avatar-ring { width: 96px; height: 96px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, var(--gold), #8b6914, var(--gold-light)); box-shadow: 0 0 30px rgba(201,168,76,0.35); }
+  .avatar-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid var(--bg); }
+  .name { font-size: 26px; font-weight: 900; letter-spacing: 0.06em; background: linear-gradient(135deg, var(--gold-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-align: center; animation: fadeDown 0.7s 0.1s ease both; margin-bottom: 10px; }
+  .bio { font-size: 13px; color: var(--muted); text-align: center; line-height: 1.7; max-width: 320px; animation: fadeDown 0.7s 0.2s ease both; margin-bottom: 36px; }
+  .bio .highlight { color: var(--gold); font-weight: 700; }
+  .divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim), var(--border), var(--gold-dim), transparent); margin-bottom: 32px; animation: fadeIn 1s 0.3s ease both; }
+  .links { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+  .link-card { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); text-decoration: none; color: var(--text); transition: all 0.25s ease; position: relative; overflow: hidden; opacity: 0; animation: slideUp 0.5s ease forwards; }
+  .link-card:hover { transform: translateY(-2px); }
+  .link-card.tiktok:hover { border-color: #69c9d0; box-shadow: 0 8px 30px rgba(105,201,208,0.15); }
+  .link-card.instagram:hover { border-color: #e1306c; box-shadow: 0 8px 30px rgba(225,48,108,0.15); }
+  .link-card.x:hover { border-color: #ffffff; box-shadow: 0 8px 30px rgba(255,255,255,0.1); }
+  .link-card.facebook:hover { border-color: #1877f2; box-shadow: 0 8px 30px rgba(24,119,242,0.15); }
+  .link-card.custom:hover { border-color: var(--gold); box-shadow: 0 8px 30px rgba(201,168,76,0.15); }
+  .icon-wrap { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
+  .tiktok .icon-wrap { background: rgba(105,201,208,0.1); }
+  .instagram .icon-wrap { background: rgba(225,48,108,0.1); }
+  .x .icon-wrap { background: rgba(255,255,255,0.07); }
+  .facebook .icon-wrap { background: rgba(24,119,242,0.1); }
+  .custom .icon-wrap { background: var(--gold-dim); }
+  .link-info { flex: 1; }
+  .link-platform { font-size: 11px; font-family: 'Space Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .link-label { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+  .x-badge { display: inline-block; background: var(--gold); color: var(--bg); font-size: 9px; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 20px; margin-left: 8px; vertical-align: middle; animation: pulse 2s infinite; }
+  .arrow { color: var(--muted); font-size: 18px; transition: transform 0.2s, color 0.2s; flex-shrink: 0; }
+  .link-card:hover .arrow { transform: translateX(3px); color: var(--gold); }
+  .link-card.soon { opacity: 0.4 !important; cursor: default; pointer-events: none; }
+  .soon-badge { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--muted); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; }
+  .footer { margin-top: 40px; text-align: center; font-family: 'Space Mono', monospace; font-size: 10px; color: #2a2e3d; letter-spacing: 0.1em; animation: fadeIn 1s 1.2s ease both; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); } 50% { box-shadow: 0 0 0 5px rgba(201,168,76,0); } }
+  .links .link-card:nth-child(1) { animation-delay: 0.35s; }
+  .links .link-card:nth-child(2) { animation-delay: 0.45s; }
+  .links .link-card:nth-child(3) { animation-delay: 0.55s; }
+  .links .link-card:nth-child(4) { animation-delay: 0.65s; }
+  .links .link-card:nth-child(5) { animation-delay: 0.75s; }
+  .links .link-card:nth-child(6) { animation-delay: 0.85s; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="avatar-wrap">
+    <div class="avatar-ring">
+      <div class="avatar-inner">👸</div>
+    </div>
+  </div>
+  <div class="name">女神挖掘機</div>
+  <div class="bio">
+    分享美好事物，祝大家永遠都有衛生紙可以用<br>
+    （<span class="highlight">點 X 就對了</span>，不要問我為什麼）
+  </div>
+  <div class="divider"></div>
+  <div class="links">
+
+    <a class="link-card x" href="https://x.com/nu_an20162?s=21" target="_blank" rel="noopener">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">X / Twitter</div>
+        <div class="link-label">來 X 找我 <span class="x-badge">★ 點我</span></div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a class="link-card tiktok" href="https://www.tiktok.com/@taiwan.goddess?_r=1&_t=ZS-95WfU4BlRep" target="_blank" rel="noopener">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#69C9D0"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.74a4.85 4.85 0 01-1.01-.05z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">TikTok</div>
+        <div class="link-label">@taiwan.goddess</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a class="link-card instagram" href="https://www.instagram.com/taiwannushenwajueji?igsh=MWI4cTIxNGlnNmg0MA%3D%3D&utm_source=qr" target="_blank" rel="noopener">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#E1306C"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">Instagram</div>
+        <div class="link-label">@taiwannushenwajueji</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <a class="link-card facebook" href="https://www.facebook.com/share/1Dqfy7me7q/?mibextid=wwXIfr" target="_blank" rel="noopener">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">Facebook</div>
+        <div class="link-label">女神挖掘機</div>
+      </div>
+      <div class="arrow">→</div>
+    </a>
+
+    <div class="link-card custom soon">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#c9a84c" opacity="0.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">即將到來</div>
+        <div class="link-label">敬請期待</div>
+      </div>
+      <span class="soon-badge">Coming Soon</span>
+    </div>
+
+    <div class="link-card custom soon">
+      <div class="icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#c9a84c" opacity="0.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      </div>
+      <div class="link-info">
+        <div class="link-platform">即將到來</div>
+        <div class="link-label">敬請期待</div>
+      </div>
+      <span class="soon-badge">Coming Soon</span>
+    </div>
+
+  </div>
+  <div class="footer">© 女神挖掘機 · All rights reserved</div>
+</div>
+</body>
+</html>
